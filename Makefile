@@ -23,8 +23,6 @@ LIB = -L ./libft -lft
 
 LIBMAKE = make -C libft/
 
-# LIBINC = -I libft/libft.h -L./libft -lft
-
 all: $(NAME)
 
 $(NAME): $(OBJ)
