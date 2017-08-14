@@ -20,6 +20,12 @@ ERROR: errormsg
 матрица смежности
 */
 
+typedef struct s_indata
+{
+	char		*str;
+	t_indata	*next;
+}				t_indata;
+
 typedef struct	s_room
 {
 	char		*name;
@@ -31,13 +37,19 @@ typedef struct	s_lemin
 {
 	int			ant_num;
 	t_room		*rooms;
+	t_indata	*raw;
 }				t_lemin;
+
+void	read_input(t_lemin *ls)
+{
+	
+}
 
 int				main(int argc, char **argv)
 {
 	t_lemin	*ls;
 
 	ls = ft_memalloc(sizeof(t_lemin));
-
+	read_input(ls);
 	return (0);
 }
