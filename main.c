@@ -100,6 +100,23 @@ int					is_good_name(char *str)
 	return (0);
 }
 
+int					is_room(char *str)
+{
+	char **tmp;
+
+	if (&& is_good_name)
+	{
+		if (ft_cnt_chr(str, ' ') == 2)
+		{
+			tmp = ft_strsplit(str, ' ');
+			if (!(ft_is_number(tmp[1])) || !(ft_is_number(tmp[2])))
+				my_error("room coordinate is not ")
+		}
+		return (1);
+	}
+	return (0);
+}
+
 t_indata			*find_ant_num(t_indata *tmp, t_lemin *ls)
 {
 	while (tmp)
@@ -108,19 +125,21 @@ t_indata			*find_ant_num(t_indata *tmp, t_lemin *ls)
 		if (!(is_comment(tmp->str)))
 		{
 			if (!(ft_is_number(tmp->str, 0, -1)))
-				my_error("First row is NOT a number!");
+				my_error("First row is NOT an integer or positive integer!");
 			if ((ls->ant_num = ft_atoi(tmp->str)) < 1)
 				my_error("No ants!");
 			tmp = tmp->next;
 			return (tmp);
 		}
+		if (is_command(tmp->str))
+			my_error("Command before ant number!");
 		tmp = tmp->next;
 	}
 	my_error("no rows!");
 	return (NULL);
 }
 
-void				parse_data(t_lemin *ls)
+void				parse_ant_and_rooms(t_lemin *ls)
 {
 	t_indata *tmp;
 
@@ -129,12 +148,25 @@ void				parse_data(t_lemin *ls)
 	{
 		if (!(is_comment(tmp->str)))
 		{
-			
-			
+			if (!(is_command(tmp->str)))
+			{
+				// if (!(is_room))
+				// {
+				// 	if (!(is_link))
+				// 		my_error("Wrong link, or no links found after room!")
+				// 	else
+				// 		break ;
+				// }
+			}
+			else
+			{
+
+			}
 			// if (*start = *end)
 		}
 		tmp = tmp->next;
 	}
+
 }
 
 void				print_indata(t_lemin *ls)
@@ -156,7 +188,7 @@ void				read_input(t_lemin *ls)
 	while(get_next_line(0, &buf) && *buf != '\0')
 		add_data(&RAW_D, buf);
 	print_indata(ls);
-	parse_data(ls);
+	parse_ant_and_rooms(ls);
 }
 
 int					main(void)
