@@ -59,19 +59,23 @@ void				add_data(t_indata **head, char *str)
 	tmp = *head;
 	if (tmp == NULL)
 	{
-		// *head = (t_indata *)ft_memalloc(sizeof(t_indata));
-		*head = (t_indata *)malloc(sizeof(t_indata));
-		(*head)->next = NULL;
+		// *head = (t_indata *)malloc(sizeof(t_indata));
+		// ft_bzero((*head), sizeof(t_indata));
+		*head = (t_indata *)ft_memalloc(sizeof(t_indata));
+		// // *head = (t_indata *)malloc(sizeof(t_indata));
+		// (*head)->next = NULL;
 		(*head)->str = (str);
 	}
 	else
 	{
 		while(tmp->next)
 			tmp = tmp->next;
-		// tmp->next = (t_indata *)ft_memalloc(sizeof(t_indata));
-		tmp->next = (t_indata *)malloc(sizeof(t_indata));
+		// tmp->next = (t_indata *)malloc(sizeof(t_indata));
+		// ft_bzero((tmp->next), sizeof(t_indata));
+		tmp->next = (t_indata *)ft_memalloc(sizeof(t_indata));
+		// // tmp->next = (t_indata *)malloc(sizeof(t_indata));
 		tmp->next->str = (str);
-		tmp->next->next = NULL;
+		// tmp->next->next = NULL;
 	}
 }
 
