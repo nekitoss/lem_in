@@ -104,17 +104,21 @@ int					is_room(char *str)
 {
 	char **tmp;
 
-	if (&& is_good_name)
+	if (is_good_name(str))
 	{
-		if (ft_cnt_chr(str, ' ') == 2)
+		if (ft_cntchr(str, ' ') == 2)
 		{
 			tmp = ft_strsplit(str, ' ');
-			if (!(ft_is_number(tmp[1])) || !(ft_is_number(tmp[2])))
-				my_error("room coordinate is not ")
+			if (!(ft_is_number(tmp[1], 0, -1)) || !(ft_is_number(tmp[2], 0, -1)))
+			{
+				my_error("room coordinate is not ");
+				return (0);
+			}
 		}
 		return (1);
 	}
-	return (0);
+	else
+		return (0);
 }
 
 t_indata			*find_ant_num(t_indata *tmp, t_lemin *ls)
@@ -125,9 +129,9 @@ t_indata			*find_ant_num(t_indata *tmp, t_lemin *ls)
 		if (!(is_comment(tmp->str)))
 		{
 			if (!(ft_is_number(tmp->str, 0, -1)))
-				my_error("First row is NOT an integer or positive integer!");
+				my_error("First row is NOT a number!");
 			if ((ls->ant_num = ft_atoi(tmp->str)) < 1)
-				my_error("No ants!");
+				my_error("No ants or non-positive number!");
 			tmp = tmp->next;
 			return (tmp);
 		}
@@ -150,13 +154,13 @@ void				parse_ant_and_rooms(t_lemin *ls)
 		{
 			if (!(is_command(tmp->str)))
 			{
-				// if (!(is_room))
-				// {
-				// 	if (!(is_link))
-				// 		my_error("Wrong link, or no links found after room!")
-				// 	else
-				// 		break ;
-				// }
+				if (!(is_room(tmp->str)))
+				{
+					// if (!(is_link(tmp->str)))\
+					// 	my_error("Wrong link, or no links found after room!");
+					// else
+					// 	break ;
+				}
 			}
 			else
 			{
