@@ -129,7 +129,7 @@ t_indata			*find_ant_num(t_indata *tmp, t_lemin *ls)
 		if (!(is_comment(tmp->str)))
 		{
 			if (!(ft_is_number(tmp->str, 0, -1)))
-				my_error("First row is NOT a number!");
+				my_error("First non-comment row is NOT a number!");
 			if ((ls->ant_num = ft_atoi(tmp->str)) < 1)
 				my_error("No ants or non-positive number!");
 			tmp = tmp->next;
@@ -164,6 +164,17 @@ void				parse_ant_and_rooms(t_lemin *ls)
 			}
 			else
 			{
+				if (tmp->next != NULL)
+				{
+					if (ft_strcmp(tmp->str, "##start") == 0)
+						printf("found start command\n");
+					else if (ft_strcmp(tmp->str, "##end") == 0)
+						printf("found end command\n");
+					else
+						printf("command, but not a start/end\n");
+				}
+				else
+					printf("found command, but reached end of list\n");
 
 			}
 			// if (*start = *end)
