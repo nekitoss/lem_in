@@ -43,6 +43,8 @@ typedef struct		s_lemin
 	t_indata		*raw;
 	size_t			start_room;
 	size_t			end_room;
+	t_room			*start_room_ptr;
+	t_room			*end_room_ptr;
 }					t_lemin;
 
 void				my_error( char *str)//, t_lemin *ls)
@@ -56,6 +58,7 @@ void				my_error( char *str)//, t_lemin *ls)
 void				add_data(t_indata **head, char *str)
 {
 	t_indata *tmp;
+
 	tmp = *head;
 	if (tmp == NULL)
 	{
@@ -77,6 +80,27 @@ void				add_data(t_indata **head, char *str)
 		tmp->next->str = (str);
 		// tmp->next->next = NULL;
 	}
+}
+
+t_room				*add_room(t_room **head, char *str)
+{
+	t_room	*tmp;
+
+	tmp = *head;
+	if (tmp == NULL)
+	{
+		*head = (t_room *)ft_memalloc(sizeof(t_room));
+		tmp = *head;
+	}
+	else
+	{
+		while(tmp->next)
+			tmp = tmp->next;
+		tmp->next = (t_room *)ft_memalloc(sizeof(t_room));
+		tmp = tmp->next;
+	}
+	tmp->name = ft_strsub(str, 0, ft_strchr(str, ' ') - str);
+	return (tmp);
 }
 
 int					is_comment(char *str)
@@ -111,9 +135,13 @@ int					is_room(char *str)
 			tmp = ft_strsplit(str, ' ');
 			if (!(ft_is_number(tmp[1], 0, -1)) || !(ft_is_number(tmp[2], 0, -1)))
 			{
-				my_error("room coordinate is not ");
+				my_error("room coordinate is not a number");
 				return (0);
 			}
+		}
+		else
+		{
+			my_error("incorrect room format");
 		}
 		return (1);
 	}
@@ -143,7 +171,61 @@ t_indata			*find_ant_num(t_indata *tmp, t_lemin *ls)
 	return (NULL);
 }
 
-void				parse_ant_and_rooms(t_lemin *ls)
+void				read_end_start_room(t_lemin *ls, t_indata **tmp, int start)
+{
+	if ((*tmp)->next)
+	{
+		*tmp = (*tmp)->next;
+		while ((*tmp) && is_comment((*tmp)->str))
+			*tmp = (*tmp)->next;
+		if (is_room((*tmp)->str))
+		{
+			// ls->start_room = counter;
+			if (start)
+				ls->start_room_ptr = add_room(&(ls->rooms), (*tmp)->str);
+			else
+				ls->end_room_ptr = add_room(&(ls->rooms), (*tmp)->str);
+			return ;
+		}
+	}
+	if (start)
+		my_error("no room after start command!");
+	else
+		my_error("no room after end command!");
+}
+
+void				print_rooms(t_lemin *ls)
+{
+	t_room *tmp;
+
+	tmp = ls->rooms;
+	printf("ROOM_LIST:\n");
+	while (tmp)
+	{
+		printf("%zu; %s\n", tmp->num, tmp->name);
+		tmp = tmp->next;
+	}
+	printf("END_ROOM_LIST;\n");
+}
+
+void				numerate_rooms(t_lemin *ls, t_room *rm)
+{
+	size_t	i;
+
+	i = 0;
+	while (rm)
+	{
+		rm->num = i;
+		if (rm == ls->start_room_ptr)
+			ls->start_room = i;
+		if (rm == ls->end_room_ptr)
+			ls->end_room = i;
+		i++;
+		rm = rm->next;
+	}
+}
+
+t_indata			*parse_ant_and_rooms(t_lemin *ls)
 {
 	t_indata *tmp;
 
@@ -154,12 +236,18 @@ void				parse_ant_and_rooms(t_lemin *ls)
 		{
 			if (!(is_command(tmp->str)))
 			{
-				if (!(is_room(tmp->str)))
+				if ((is_room(tmp->str)))
 				{
-					// if (!(is_link(tmp->str)))\
-					// 	my_error("Wrong link, or no links found after room!");
-					// else
-					// 	break ;
+					add_room(&(ls->rooms), tmp->str);
+				}
+				// else if ((is_link(tmp->str)))
+				// {
+				// 	printf("REACHED LINKS\n");
+				// 	return (tmp);
+				// }
+				else
+				{
+					my_error("Wrong link, or no links found after room!");
 				}
 			}
 			else
@@ -167,11 +255,22 @@ void				parse_ant_and_rooms(t_lemin *ls)
 				if (tmp->next != NULL)
 				{
 					if (ft_strcmp(tmp->str, "##start") == 0)
+					{
 						printf("found start command\n");
+						read_end_start_room(ls, &tmp, 1);
+						printf("start room ptr:%p\n", ls->start_room_ptr);
+					}
 					else if (ft_strcmp(tmp->str, "##end") == 0)
+					{
 						printf("found end command\n");
+						read_end_start_room(ls, &tmp, 0);
+						printf("start room ptr:%p\n", ls->end_room_ptr);
+						//read_end_room(ls, &tmp);
+					}
 					else
+					{
 						printf("command, but not a start/end\n");
+					}
 				}
 				else
 					printf("found command, but reached end of list\n");
@@ -181,7 +280,9 @@ void				parse_ant_and_rooms(t_lemin *ls)
 		}
 		tmp = tmp->next;
 	}
-
+	numerate_rooms(ls, ls->rooms);
+	print_rooms(ls);
+	return (tmp);
 }
 
 void				print_indata(t_lemin *ls)
@@ -196,6 +297,11 @@ void				print_indata(t_lemin *ls)
 	}
 }
 
+void				parse_links(t_lemin *ls, t_indata *tmp)
+{
+	
+}
+
 void				read_input(t_lemin *ls)
 {
 	char	*buf;
@@ -203,7 +309,8 @@ void				read_input(t_lemin *ls)
 	while(get_next_line(0, &buf) && *buf != '\0')
 		add_data(&RAW_D, buf);
 	print_indata(ls);
-	parse_ant_and_rooms(ls);
+	t_indata *process = parse_ant_and_rooms(ls);
+	parse_links(ls, process);
 }
 
 int					main(void)
