@@ -149,6 +149,13 @@ int					is_room(char *str)
 		return (0);
 }
 
+int					is_link(char *str)
+{
+	if (ft_cntchr(str, '-') == 1)
+		return (1);
+	return (0);
+}
+
 t_indata			*find_ant_num(t_indata *tmp, t_lemin *ls)
 {
 	while (tmp)
@@ -240,11 +247,11 @@ t_indata			*parse_ant_and_rooms(t_lemin *ls)
 				{
 					add_room(&(ls->rooms), tmp->str);
 				}
-				// else if ((is_link(tmp->str)))
-				// {
-				// 	printf("REACHED LINKS\n");
-				// 	return (tmp);
-				// }
+				else if ((is_link(tmp->str)))
+				{
+					printf("REACHED LINKS\n");
+					return (tmp);
+				}
 				else
 				{
 					my_error("Wrong link, or no links found after room!");
@@ -297,9 +304,26 @@ void				print_indata(t_lemin *ls)
 	}
 }
 
+size_t				find_room_number_by_name(t_lemin *ls, char *str)
+{
+
+}
+
 void				parse_links(t_lemin *ls, t_indata *tmp)
 {
-	
+	char	**arr;
+	size_t	n;
+
+	while (tmp)
+	{
+		if (is_link(tmp->str))
+		{
+			arr = ft_strsplit(tmp->str, '-');
+			n = find_room_number_by_name(ls, arr[0]);
+		}
+		else
+			my_error("wronk link format")
+	}
 }
 
 void				read_input(t_lemin *ls)
