@@ -95,7 +95,13 @@ t_room				*add_room(t_room **head, char *str)
 	else
 	{
 		while(tmp->next)
+		{
+			if (ft_strnequ(str, tmp->name, ft_strlen(tmp->name)))
+				my_error("room already exist!");
 			tmp = tmp->next;
+		}
+		if (ft_strnequ(str, tmp->name, ft_strlen(tmp->name)))
+				my_error("room already exist!");
 		tmp->next = (t_room *)ft_memalloc(sizeof(t_room));
 		tmp = tmp->next;
 	}
@@ -124,6 +130,13 @@ int					is_good_name(char *str)
 	return (0);
 }
 
+int					is_link(char *str)
+{
+	if (ft_cntchr(str, '-') == 1)
+		return (1);
+	return (0);
+}
+
 int					is_room(char *str)
 {
 	char **tmp;
@@ -141,19 +154,14 @@ int					is_room(char *str)
 		}
 		else
 		{
+			if (is_link(str))
+				return (0);
 			my_error("incorrect room format");
 		}
 		return (1);
 	}
 	else
 		return (0);
-}
-
-int					is_link(char *str)
-{
-	if (ft_cntchr(str, '-') == 1)
-		return (1);
-	return (0);
 }
 
 t_indata			*find_ant_num(t_indata *tmp, t_lemin *ls)
@@ -235,7 +243,7 @@ void				numerate_rooms(t_lemin *ls, t_room *rm)
 t_indata			*parse_ant_and_rooms(t_lemin *ls)
 {
 	t_indata *tmp;
-
+printf("\nSTART PARSING\n");
 	tmp = find_ant_num(RAW_D, ls);
 	while (tmp)
 	{
@@ -287,8 +295,6 @@ t_indata			*parse_ant_and_rooms(t_lemin *ls)
 		}
 		tmp = tmp->next;
 	}
-	numerate_rooms(ls, ls->rooms);
-	print_rooms(ls);
 	return (tmp);
 }
 
@@ -306,23 +312,39 @@ void				print_indata(t_lemin *ls)
 
 size_t				find_room_number_by_name(t_lemin *ls, char *str)
 {
-
+	t_room	*tmp;
+	
+	tmp = ls->rooms;
+	while (tmp)
+	{
+		if (ft_strequ(str, tmp->name))
+			return (tmp->num);
+		tmp = tmp->next;
+	}
+	my_error("wrong link - no room with such name!");
+	return (0);
 }
 
 void				parse_links(t_lemin *ls, t_indata *tmp)
 {
 	char	**arr;
-	size_t	n;
+	size_t	n1;
+	size_t	n2;
 
+	if (tmp == NULL)
+		my_error("no links found");
 	while (tmp)
 	{
 		if (is_link(tmp->str))
 		{
 			arr = ft_strsplit(tmp->str, '-');
-			n = find_room_number_by_name(ls, arr[0]);
+			n1 = find_room_number_by_name(ls, arr[0]);
+			n2 = find_room_number_by_name(ls, arr[1]);
+			printf("%zu(%s)-->%zu(%s)\n", n1, arr[0], n2, arr[1]);
 		}
 		else
-			my_error("wronk link format")
+			my_error("wronk link format");
+		tmp = tmp->next;
 	}
 }
 
@@ -334,6 +356,8 @@ void				read_input(t_lemin *ls)
 		add_data(&RAW_D, buf);
 	print_indata(ls);
 	t_indata *process = parse_ant_and_rooms(ls);
+	numerate_rooms(ls, ls->rooms);
+	print_rooms(ls);
 	parse_links(ls, process);
 }
 
