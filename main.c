@@ -24,7 +24,7 @@ ERROR: errormsg
 #define ROOM (ls->rooms)
 #define NO_LINK 0
 #define LINKED 1
-#define BLOCKED 2
+#define BLOCKED 3
 
 typedef struct 		s_indata
 {
@@ -378,46 +378,66 @@ void				parse_links(t_lemin *ls, t_indata *tmp)
 	}
 }
 
-// void				ublock_row(t_lemin *ls, size_t row)
-// {
-// 	size_t i;
+void				unblock_row(t_lemin *ls, size_t row, size_t next_row)
+{
+	size_t i;
 
-// 	i = 0;
-// 	while (i < ls->room_quantity)
-// 	{
-// 		if (ls->dep_matr[row][i] == BLOCKED)
-// 			ls->dep_matr[row][i] = LINKED;
-// 		i++;
-// 	}
-// }
+	i = 0;
+	while (i < ls->room_quantity)
+	{
+		if (ls->dep_matr[row][i] == BLOCKED)
+			ls->dep_matr[row][i] = LINKED;
+		i++;
+	}
+	ls->dep_matr[next_row][row] = LINKED;
+}
 
-// void				set_row_blocked(t_lemin *ls, size_t row)
-// {
-// 	size_t i;
+void				set_row_blocked(t_lemin *ls, size_t row, size_t next_row)
+{
+	size_t i;
 
-// 	i = 0;
-// 	while (i < ls->room_quantity)
-// 	{
-// 		if (ls->dep_matr[row][i] == LINKED)
-// 			ls->dep_matr[row][i] = BLOCKED;
-// 		i++;
-// 	}
-// }
+	i = 0;
+	while (i < ls->room_quantity)
+	{
+		if (ls->dep_matr[row][i] == LINKED)
+			ls->dep_matr[row][i] = BLOCKED;
+		i++;
+	}
+	ls->dep_matr[next_row][row] = BLOCKED;
+}
 
-// void				find_shortest_way(t_lemin *ls)
-// {
-// 	size_t	i;
-// 	size_t	j;
+int					find_shortest_way(t_lemin *ls, size_t row)
+{
+	size_t	j;
+// print_dep_matrix(ls);
+	j = 0;
+	if (row == ls->end_room)
+	{
+		printf("-%zu-", row);
+		return (1);
+	}
+	while (j < ls->room_quantity)
+	{
+		if (row != j && ls->dep_matr[row][j] == LINKED)
+		{
+			set_row_blocked(ls, row, j);
+			if (!find_shortest_way(ls, j))
+				unblock_row(ls, row, j);
+			else
+			{
+				printf("-%zu-", row);
+				return (1);
+			}
+		}
+		j++;
+	}
+	return (0);
+}
 
-// 	j = 0;
-// 	i = ls->start_room;
-// 	while ()
-// 	{
-
-// 		set_row_blocked(ls, i);
-
-// 	}
-// }
+void				direct_connection()
+{
+	my_error("DIRECT_CONNECTION_UNFINISHED");
+}
 
 void				read_input(t_lemin *ls)
 {
@@ -431,10 +451,13 @@ void				read_input(t_lemin *ls)
 	print_rooms(ls);
 	parse_links(ls, process);
 	print_dep_matrix(ls);
-	//if (ls->dep_matr[ls->start_room][ls->end_room] == LINKED)
-	//	direct_connection();
-	//else
-	//	find_shortest_way(ls);
+	if (ls->dep_matr[ls->start_room][ls->end_room] == LINKED)
+		direct_connection();
+	else
+	{
+		if (!find_shortest_way(ls, ls->start_room))
+			my_error("no way found");
+	}
 }
 
 int					main(void)
