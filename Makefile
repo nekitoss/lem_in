@@ -7,6 +7,8 @@ ifeq ($(UNAME), Linux)
 	CC = c99
 endif
 
+FAST = -Ofast
+
 FLAGS = -Wall -Wextra -Werror
 
 NAME = lem-in
@@ -31,7 +33,7 @@ $(NAME): $(OBJ)
 	@echo  "\033[32mCompiled and created lem-in binary\033[0m"
 
 %.o: %.c
-	@$(CC) $(INC) -Ofast $(FLAGS) -c -o $@ $<
+	@$(CC) $(INC) $(FAST) $(FLAGS) -c -o $@ $<
 
 clean: libclean
 	@rm -f $(OBJ)
