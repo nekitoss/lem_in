@@ -31,7 +31,7 @@ $(NAME): $(OBJ)
 	@echo  "\033[32mCompiled and created lem-in binary\033[0m"
 
 %.o: %.c
-	@$(CC) $(INC) $(FLAGS) -c -o $@ $<
+	@$(CC) $(INC) -Ofast $(FLAGS) -c -o $@ $<
 
 clean: libclean
 	@rm -f $(OBJ)

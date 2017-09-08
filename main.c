@@ -22,6 +22,9 @@ ERROR: errormsg
 
 #define RAW_D (ls->raw)
 #define ROOM (ls->rooms)
+#define NO_LINK 0
+#define LINKED 1
+#define BLOCKED 2
 
 typedef struct 		s_indata
 {
@@ -45,6 +48,8 @@ typedef struct		s_lemin
 	size_t			end_room;
 	t_room			*start_room_ptr;
 	t_room			*end_room_ptr;
+	int				**dep_matr;
+	size_t			room_quantity;
 }					t_lemin;
 
 void				my_error( char *str)//, t_lemin *ls)
@@ -223,6 +228,27 @@ void				print_rooms(t_lemin *ls)
 	printf("END_ROOM_LIST;\n");
 }
 
+void				print_dep_matrix(t_lemin *ls)
+{
+	size_t	i;
+	size_t	j;
+
+	i = 0;
+	printf("DEPENDANCE_MATRIX:\n");
+	while (i < ls->room_quantity)
+	{
+		j = 0;
+		while (j < ls->room_quantity)
+		{
+			printf("% 2d", ls->dep_matr[i][j]);
+			j++;
+		}
+		printf("\n");
+		i++;
+	}
+	printf("END_DEPENDANCE_MATRIX;\n");
+}
+
 void				numerate_rooms(t_lemin *ls, t_room *rm)
 {
 	size_t	i;
@@ -238,6 +264,7 @@ void				numerate_rooms(t_lemin *ls, t_room *rm)
 		i++;
 		rm = rm->next;
 	}
+	ls->room_quantity = i;
 }
 
 t_indata			*parse_ant_and_rooms(t_lemin *ls)
@@ -333,6 +360,7 @@ void				parse_links(t_lemin *ls, t_indata *tmp)
 
 	if (tmp == NULL)
 		my_error("no links found");
+	ls->dep_matr = ft_newarrint(ls->room_quantity, ls->room_quantity);
 	while (tmp)
 	{
 		if (is_link(tmp->str))
@@ -341,12 +369,55 @@ void				parse_links(t_lemin *ls, t_indata *tmp)
 			n1 = find_room_number_by_name(ls, arr[0]);
 			n2 = find_room_number_by_name(ls, arr[1]);
 			printf("%zu(%s)-->%zu(%s)\n", n1, arr[0], n2, arr[1]);
+			ls->dep_matr[n1][n2] = LINKED;
+			ls->dep_matr[n2][n1] = LINKED;
 		}
 		else
 			my_error("wronk link format");
 		tmp = tmp->next;
 	}
 }
+
+// void				ublock_row(t_lemin *ls, size_t row)
+// {
+// 	size_t i;
+
+// 	i = 0;
+// 	while (i < ls->room_quantity)
+// 	{
+// 		if (ls->dep_matr[row][i] == BLOCKED)
+// 			ls->dep_matr[row][i] = LINKED;
+// 		i++;
+// 	}
+// }
+
+// void				set_row_blocked(t_lemin *ls, size_t row)
+// {
+// 	size_t i;
+
+// 	i = 0;
+// 	while (i < ls->room_quantity)
+// 	{
+// 		if (ls->dep_matr[row][i] == LINKED)
+// 			ls->dep_matr[row][i] = BLOCKED;
+// 		i++;
+// 	}
+// }
+
+// void				find_shortest_way(t_lemin *ls)
+// {
+// 	size_t	i;
+// 	size_t	j;
+
+// 	j = 0;
+// 	i = ls->start_room;
+// 	while ()
+// 	{
+
+// 		set_row_blocked(ls, i);
+
+// 	}
+// }
 
 void				read_input(t_lemin *ls)
 {
@@ -359,6 +430,11 @@ void				read_input(t_lemin *ls)
 	numerate_rooms(ls, ls->rooms);
 	print_rooms(ls);
 	parse_links(ls, process);
+	print_dep_matrix(ls);
+	//if (ls->dep_matr[ls->start_room][ls->end_room] == LINKED)
+	//	direct_connection();
+	//else
+	//	find_shortest_way(ls);
 }
 
 int					main(void)
