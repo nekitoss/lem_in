@@ -203,7 +203,7 @@ void				read_end_start_room(t_lemin *ls, t_indata **tmp, int start)
 			// ls->start_room = counter;
 			if (start)
 			{	
-				if (ls->start_room_ptr))
+				if (ls->start_room_ptr)
 					my_error("start command repeats!");
 				ls->start_room_ptr = add_room(&(ls->rooms), (*tmp)->str);
 			}
@@ -317,10 +317,10 @@ t_indata			*parse_ant_and_rooms(t_lemin *ls)
 						//printf("start room ptr:%p\n", ls->end_room_ptr);
 						//read_end_room(ls, &tmp);
 					}
-					else
-					{
-						printf("command, but not a start/end\n");
-					}
+					//else
+					//{
+					//	printf("command, but not a start/end\n");
+					//}
 				}
 				else
 					printf("found command, but reached end of list\n");
@@ -376,7 +376,7 @@ void				parse_links(t_lemin *ls, t_indata *tmp)
 			arr = ft_strsplit(tmp->str, '-');
 			n1 = find_room_number_by_name(ls, arr[0]);
 			n2 = find_room_number_by_name(ls, arr[1]);
-			printf("%zu(%s)-->%zu(%s)\n", n1, arr[0], n2, arr[1]);
+			//printf("%zu(%s)-->%zu(%s)\n", n1, arr[0], n2, arr[1]);
 			ls->dep_matr[n1][n2] = LINKED;
 			ls->dep_matr[n2][n1] = LINKED;
 		}
@@ -453,12 +453,17 @@ void				read_input(t_lemin *ls)
 
 	while(get_next_line(0, &buf) && *buf != '\0')
 		add_data(&RAW_D, buf);
+	ft_strdel(&buf);
 	print_indata(ls);
 	t_indata *process = parse_ant_and_rooms(ls);
+	if (!(ls->start_room_ptr))
+		my_error("no start command found!");
+	if (!(ls->end_room_ptr))
+		my_error("no end command found!");
 	numerate_rooms(ls, ls->rooms);
-	print_rooms(ls);
+	//print_rooms(ls);
 	parse_links(ls, process);
-	print_dep_matrix(ls);
+	//print_dep_matrix(ls);
 	if (ls->dep_matr[ls->start_room][ls->end_room] == LINKED)
 		direct_connection();
 	else
