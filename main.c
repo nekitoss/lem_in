@@ -202,9 +202,17 @@ void				read_end_start_room(t_lemin *ls, t_indata **tmp, int start)
 		{
 			// ls->start_room = counter;
 			if (start)
+			{	
+				if (ls->start_room_ptr))
+					my_error("start command repeats!");
 				ls->start_room_ptr = add_room(&(ls->rooms), (*tmp)->str);
+			}
 			else
+			{
+				if (ls->end_room_ptr)
+					my_error("end command repeats!");
 				ls->end_room_ptr = add_room(&(ls->rooms), (*tmp)->str);
+			}
 			return ;
 		}
 	}
@@ -270,7 +278,7 @@ void				numerate_rooms(t_lemin *ls, t_room *rm)
 t_indata			*parse_ant_and_rooms(t_lemin *ls)
 {
 	t_indata *tmp;
-printf("\nSTART PARSING\n");
+//printf("\nSTART PARSING\n");
 	tmp = find_ant_num(RAW_D, ls);
 	while (tmp)
 	{
@@ -284,7 +292,7 @@ printf("\nSTART PARSING\n");
 				}
 				else if ((is_link(tmp->str)))
 				{
-					printf("REACHED LINKS\n");
+					//printf("REACHED LINKS\n");
 					return (tmp);
 				}
 				else
@@ -298,15 +306,15 @@ printf("\nSTART PARSING\n");
 				{
 					if (ft_strcmp(tmp->str, "##start") == 0)
 					{
-						printf("found start command\n");
+						//printf("found start command\n");
 						read_end_start_room(ls, &tmp, 1);
-						printf("start room ptr:%p\n", ls->start_room_ptr);
+						//printf("start room ptr:%p\n", ls->start_room_ptr);
 					}
 					else if (ft_strcmp(tmp->str, "##end") == 0)
 					{
-						printf("found end command\n");
+						//printf("found end command\n");
 						read_end_start_room(ls, &tmp, 0);
-						printf("start room ptr:%p\n", ls->end_room_ptr);
+						//printf("start room ptr:%p\n", ls->end_room_ptr);
 						//read_end_room(ls, &tmp);
 					}
 					else
