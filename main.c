@@ -455,7 +455,7 @@ void				read_input(t_lemin *ls)
 		add_data(&RAW_D, buf);
 	if (!(ls->raw) || (ls->raw->str)[0] == '\0')
 		my_error("empty file!");
-	ft_strdel(&buf);
+	// ft_strdel(&buf);
 	print_indata(ls);
 	t_indata *process = parse_ant_and_rooms(ls);
 	if (!(ls->start_room_ptr))
