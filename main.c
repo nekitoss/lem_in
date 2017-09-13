@@ -26,6 +26,8 @@ ERROR: errormsg
 #define LINKED 1
 #define BLOCKED 3
 
+#define ARRAY_TYPE size_t
+
 typedef struct 		s_path
 {
 	size_t			lenth;
@@ -56,10 +58,10 @@ typedef struct		s_lemin
 	t_room			*start_room_ptr;
 	t_room			*end_room_ptr;
 	int				**dep_matr;
-	size_t			*temp_solv;
+	ARRAY_TYPE		*temp_solv;
 	size_t			room_quantity;
 	size_t			shortest_way;
-	size_t				*final_solv;
+	ARRAY_TYPE		*final_solv;
 }					t_lemin;
 
 void				my_error(char *str1, char *str2)//, t_lemin *ls)
@@ -421,23 +423,42 @@ int					seen_before(t_lemin *ls, size_t *depth, size_t row_to_check)
 	}
 	return (0);
 }
+// size_t cnt = 0;
 
 void					find_shortest_way(t_lemin *ls, size_t row, size_t *depth)
 {
 	size_t	j;
+	
 // print_dep_matrix(ls);
+	if ((*depth) > ls->shortest_way)
+		return ;
 	if (row == ls->end_room && (*depth) < ls->shortest_way)
 	{
+		// cnt++;
 		(ls->temp_solv)[(*depth)] = row;
 		ls->shortest_way = *depth;
-		for (size_t z = 0; z <= (*depth); z++)
-		{
-			ls->final_solv[z] = ls->temp_solv[z];
-			// printf(" %2zu", (ls->temp_solv)[z]);
-		}
+		// printf("\n%zu\n", *depth);
+		// zz = 0;
+
+		// while (zz < *depth)
+		// {
+		// 	ls->final_solv[zz] = ls->temp_solv[zz];
+		// 	zz++;
+		// }
+		// printf("\ndepth=%zu\n", *depth);
+		// for (unsigned int z = 0; z <= (*depth); z++)
+		// {
+		// 	ls->final_solv[z] = ls->temp_solv[z];
+		// 	// printf(" %2zu", (ls->temp_solv)[z]);
+		// }
 		// printf("\n");
+		//memcpy(&(ls->shortest_way), depth, sizeof(ARRAY_TYPE));
+		//printf("shortest = %zu\n", ls->shortest_way);
+		ft_memcpy(ls->final_solv, ls->temp_solv, sizeof(ARRAY_TYPE) * (*depth + 1));
+		// ls->shortest_way = (*depth);
 		return ;
 	}
+	// cnt++;
 	// if ((*depth) > ls->room_quantity + 1)
 	// 	my_error("recursion gone to deep in you", "");
 	j = 0;
@@ -446,7 +467,6 @@ void					find_shortest_way(t_lemin *ls, size_t row, size_t *depth)
 		// if (row != j && ls->dep_matr[row][j] == LINKED && !seen_before(ls, depth, j))
 		if (ls->dep_matr[row][j] == LINKED && !seen_before(ls, depth, j))
 		{
-
 			(ls->temp_solv)[(*depth)] = row;
 			(*depth)++;
 			find_shortest_way(ls, j, depth);
@@ -486,16 +506,18 @@ void				read_input(t_lemin *ls)
 		direct_connection();
 	else
 	{
-		ls->temp_solv = (size_t *)ft_memalloc(sizeof(size_t) * ls->room_quantity + 1);
-		ls->final_solv = (size_t *)ft_memalloc(sizeof(size_t) * ls->room_quantity + 1);
-		ls->shortest_way = ls->room_quantity + 1;
-		// if (!find_shortest_way(ls, ls->start_room, 0))
-		// 	my_error("no way exists", "");
+		ls->temp_solv = (ARRAY_TYPE *)ft_memalloc(sizeof(ARRAY_TYPE) * ls->room_quantity + 1);
+		ls->final_solv = (ARRAY_TYPE *)ft_memalloc(sizeof(ARRAY_TYPE) * ls->room_quantity + 1);
+		ls->shortest_way = ULONG_MAX;
 		find_shortest_way(ls, ls->start_room, &depth);
+		if (ls->shortest_way == ULONG_MAX)
+			my_error("start and end are not connected", "");
+		// printf("shortest len=%zu\n", ls->shortest_way);
 	}
-	for (size_t z = 0; z <= ls->shortest_way; z++)
-			printf("%3zu", ls->final_solv[z]);
-	printf("\n");
+	// printf("cnt = %zu\n", cnt);
+// 	for (size_t z = 0; z <= ls->shortest_way; z++)
+// 			printf("%3zu", ls->final_solv[z]);
+// 	printf("\n");
 }
 
 int					main(void)
