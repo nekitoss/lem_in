@@ -390,7 +390,7 @@ void				parse_links(t_lemin *ls, t_indata *tmp)
 	ls->dep_matr = ft_newarrint(ls->room_quantity, ls->room_quantity);
 	while (tmp)
 	{
-		if (is_link(tmp->str))
+		if (*(tmp->str) != '#' && is_link(tmp->str))
 		{
 			arr = ft_strsplit(tmp->str, '-');
 			n1 = find_room_number_by_name(ls, arr[0]);
@@ -474,9 +474,18 @@ void					find_shortest_way(t_lemin *ls, size_t row, size_t *depth)
 	}
 }
 
-void				direct_connection()
+void				direct_connection(t_lemin *ls)
 {
-	my_error("DIRECT_CONNECTION_UNFINISHED", " FINISH_HIM");
+	size_t	i;
+
+	i = 1;
+	printf("\n");
+	while (i < ls->ant_num + 1)
+	{
+		printf("L%zu-%s ", i, ls->end_room_ptr->name);
+		i++;
+	}
+	printf("\n");
 }
 
 char				*find_room_name_by_number(t_lemin *ls, size_t num)
@@ -507,11 +516,11 @@ void				print_result(t_lemin *ls)
 		i++;
 	}
 	i = 0;
-	st_num = 0
+	st_num = 0;
 	printf("\n");
 	while (st_num <= ls->ant_num + ls->shortest_way)
 	{
-		i = 0;
+		i = 1;
 		while (i <= ls->shortest_way && i <= st_num)
 		{
 			if (st_num - i < ls->ant_num)
@@ -545,7 +554,7 @@ void				read_input(t_lemin *ls)
 	parse_links(ls, process);
 	// print_dep_matrix(ls);
 	if (ls->dep_matr[ls->start_room][ls->end_room] == LINKED)
-		direct_connection();
+		direct_connection(ls);
 	else
 	{
 		ls->temp_solv = (ARRAY_TYPE *)ft_memalloc(sizeof(ARRAY_TYPE) * ls->room_quantity + 1);
@@ -558,9 +567,9 @@ void				read_input(t_lemin *ls)
 		print_result(ls);
 	}
 	// printf("cnt = %zu\n", cnt);
-	for (size_t z = 0; z <= ls->shortest_way; z++)
-			printf("-%s-", (ls->names)[z]);
-	printf("\n");
+	// for (size_t z = 0; z <= ls->shortest_way; z++)
+	// 		printf("-%s-", (ls->names)[z]);
+	// printf("\n");
 
 }
 

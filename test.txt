@@ -2,13 +2,21 @@
 ##start
 qwert 0 0
 aaa 1 1
+#aaa 1 1
+##aaa 1 1
+#qwert-poiu
+##qwert-poiu
 bbbbb 2 2
 ##end
 poiu 3 3
+#links
 qwert-aaa
 qwert-bbbbb
 aaa-bbbbb
 aaa-poiu
 bbbbb-poiu
 bbbbb-bbbbb
-
+#aaa 1 1
+##aaa 1 1
+#qwert-poiu
+##qwert-poiu
