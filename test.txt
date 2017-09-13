@@ -1,14 +1,14 @@
-9
+3
 ##start
-0 0 0
-1 1 1
-2 2 2
+qwert 0 0
+aaa 1 1
+bbbbb 2 2
 ##end
-3 3 3
-0-1
-0-2
-1-2
-1-3
-2-3
-2-2
+poiu 3 3
+qwert-aaa
+qwert-bbbbb
+aaa-bbbbb
+aaa-poiu
+bbbbb-poiu
+bbbbb-bbbbb
 

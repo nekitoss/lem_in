@@ -50,7 +50,7 @@ typedef struct		s_room
 
 typedef struct		s_lemin
 {
-	int				ant_num;
+	size_t			ant_num;
 	t_room			*rooms;
 	t_indata		*raw;
 	size_t			start_room;
@@ -62,6 +62,7 @@ typedef struct		s_lemin
 	size_t			room_quantity;
 	size_t			shortest_way;
 	ARRAY_TYPE		*final_solv;
+	char			**names;
 }					t_lemin;
 
 void				my_error(char *str1, char *str2)//, t_lemin *ls)
@@ -185,26 +186,23 @@ int					is_room(char *str)
 
 t_indata			*find_ant_num(t_indata *tmp, t_lemin *ls)
 {
+	int		ant_tmp;
+
 	while (tmp)
 	{
-		// printf("trying: %s\n", tmp->str);
 		if ((is_command(tmp->str) && ((ft_strcmp(tmp->str, "##start") && ft_strcmp(tmp->str, "##end")))) || (is_comment(tmp->str)))
 		{
 			tmp = tmp->next;
 			continue ;
 		}
-		// else
-		// {
-			if (!(ft_is_number(tmp->str, 0, -1)))
-				my_error("Wrong line instead ant number: ", tmp->str);
-			if ((ls->ant_num = ft_atoi(tmp->str)) < 1)
-				my_error("Wrong number of ants: ", tmp->str);
-			tmp = tmp->next;
-			return (tmp);
-		// }
-		// else
-			
-		
+		if (!(ft_is_number(tmp->str, 0, -1)))
+			my_error("Wrong line instead ant number: ", tmp->str);
+		ant_tmp = ft_atoi(tmp->str);
+		if (ant_tmp < 1)
+			my_error("Wrong number of ants: ", tmp->str);
+		ls->ant_num = (size_t)ant_tmp;
+		tmp = tmp->next;
+		return (tmp);
 	}
 	my_error("no rows!", "");
 	return (NULL);
@@ -481,6 +479,50 @@ void				direct_connection()
 	my_error("DIRECT_CONNECTION_UNFINISHED", " FINISH_HIM");
 }
 
+char				*find_room_name_by_number(t_lemin *ls, size_t num)
+{
+	t_room	*tmp;
+	
+	tmp = ls->rooms;
+	while (tmp)
+	{
+		if (num == tmp->num)
+			return (tmp->name);
+		tmp = tmp->next;
+	}
+	my_error("internal:", "no name with such number");
+	return (NULL);
+}
+
+void				print_result(t_lemin *ls)
+{
+	size_t	i;
+	size_t	st_num;
+
+	ls->names = (char **)ft_memalloc(sizeof(char *) * (ls->shortest_way + 2));
+	i = 0;
+	while (i < ls->shortest_way + 1)
+	{
+		(ls->names)[i] = find_room_name_by_number(ls, (ls->final_solv)[i]);
+		i++;
+	}
+	i = 0;
+	st_num = 0
+	printf("\n");
+	while (st_num <= ls->ant_num + ls->shortest_way)
+	{
+		i = 0;
+		while (i <= ls->shortest_way && i <= st_num)
+		{
+			if (st_num - i < ls->ant_num)
+				printf("L%zu-%s ", st_num - i + 1, (ls->names)[i]);
+			i++;
+		}
+		printf("\n");
+		st_num++;
+	}
+}
+
 void				read_input(t_lemin *ls)
 {
 	char	*buf;
@@ -501,7 +543,7 @@ void				read_input(t_lemin *ls)
 	numerate_rooms(ls, ls->rooms);
 	//print_rooms(ls);
 	parse_links(ls, process);
-	print_dep_matrix(ls);
+	// print_dep_matrix(ls);
 	if (ls->dep_matr[ls->start_room][ls->end_room] == LINKED)
 		direct_connection();
 	else
@@ -513,11 +555,13 @@ void				read_input(t_lemin *ls)
 		if (ls->shortest_way == ULONG_MAX)
 			my_error("start and end are not connected", "");
 		// printf("shortest len=%zu\n", ls->shortest_way);
+		print_result(ls);
 	}
 	// printf("cnt = %zu\n", cnt);
-// 	for (size_t z = 0; z <= ls->shortest_way; z++)
-// 			printf("%3zu", ls->final_solv[z]);
-// 	printf("\n");
+	for (size_t z = 0; z <= ls->shortest_way; z++)
+			printf("-%s-", (ls->names)[z]);
+	printf("\n");
+
 }
 
 int					main(void)
