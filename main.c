@@ -21,19 +21,18 @@ ERROR: errormsg
 */
 
 #define RAW_D (ls->raw)
-#define ROOM (ls->rooms)
 #define NO_LINK 0
 #define LINKED 1
 #define BLOCKED 3
 
 #define ARRAY_TYPE size_t
 
-typedef struct 		s_path
-{
-	size_t			lenth;
-	size_t			*solv;
-	struct s_path	*next;
-}					t_path;
+// typedef struct 		s_path
+// {
+// 	size_t			lenth;
+// 	size_t			*solv;
+// 	struct s_path	*next;
+// }					t_path;
 
 typedef struct 		s_indata
 {
@@ -50,20 +49,77 @@ typedef struct		s_room
 
 typedef struct		s_lemin
 {
-	size_t			ant_num;
+	char			**names;
 	t_room			*rooms;
-	t_indata		*raw;
-	size_t			start_room;
-	size_t			end_room;
 	t_room			*start_room_ptr;
 	t_room			*end_room_ptr;
-	int				**dep_matr;
+	t_indata		*raw;
 	ARRAY_TYPE		*temp_solv;
+	ARRAY_TYPE		*final_solv;
+	int				**dep_matr;
+	size_t			ant_num;
+	size_t			start_room;
+	size_t			end_room;
 	size_t			room_quantity;
 	size_t			shortest_way;
-	ARRAY_TYPE		*final_solv;
-	char			**names;
 }					t_lemin;
+
+void				free_rooms(t_room **fr_r_ptr)
+{
+	if (fr_r_ptr != NULL && *fr_r_ptr != NULL)
+	{
+		free_rooms(&((*fr_r_ptr)->next));
+		ft_strdel(&((*fr_r_ptr)->name));
+		ft_memdel((void **)fr_r_ptr);
+	}
+	return ;
+}
+
+void				free_raw(t_indata **fr_r_ptr)
+{
+	if (fr_r_ptr != NULL && *fr_r_ptr != NULL)
+	{
+		free_raw(&((*fr_r_ptr)->next));
+		ft_strdel(&((*fr_r_ptr)->str));
+		ft_memdel((void **)fr_r_ptr);
+	}
+	return ;
+}
+
+void				free_all_data(t_lemin *ls)
+{
+	if (ls)
+	{
+		ft_strdel((char **)&(ls->names));
+		// if (ls->names == NULL)
+		// 	printf("arr names freed\n");
+		free_rooms(&(ls->rooms));
+		// if (ls->rooms == NULL)
+		// 	printf("struct t_room ls->rooms succesfully freed\n");
+		ls->start_room_ptr = NULL;
+		ls->end_room_ptr = NULL;
+		free_raw(&(ls->raw));
+		// if (ls->raw == NULL)
+		// 	printf("struct t_indata ls->raw succesfully freed\n");
+		ft_strdel((char **)&(ls->temp_solv));
+		// if (ls->temp_solv == NULL)
+		// 	printf("arr temp_solv freed\n");
+		ft_strdel((char **)&(ls->final_solv));
+		// if (ls->final_solv == NULL)
+		// 	printf("arr final_solv freed\n");
+		ft_arrdel((void ***)&(ls->dep_matr));
+		// if (ls->dep_matr == NULL)
+		// 	printf("arr dep_matr freed\n");
+		ls->ant_num = 0;
+		ls->start_room = 0;
+		ls->end_room = 0;
+		ls->room_quantity = 0;
+		ls->shortest_way = 0;
+		ft_strdel((char **)&(ls));
+		// if (ls == NULL)
+		// 	printf("struct t_lemin freed\n");
+	}
+}
 
 void				my_error(char *str1, char *str2)//, t_lemin *ls)
 {
@@ -171,6 +227,7 @@ int					is_room(char *str)
 				my_error("room coordinate is not a number: ", (!(ft_is_number(tmp[1], 0, -1)) ? tmp[1] : tmp[2]));
 				return (0);
 			}
+			ft_arrdel((void ***)&tmp);
 		}
 		else
 		{
@@ -401,6 +458,7 @@ void				parse_links(t_lemin *ls, t_indata *tmp)
 			ls->dep_matr[n1][n2] = LINKED;
 			ls->dep_matr[n2][n1] = LINKED;
 			}
+			ft_arrdel((void ***)&arr);
 		}
 		else if (!(is_command(tmp->str) && (ft_strcmp(tmp->str, "##start") && ft_strcmp(tmp->str, "##end"))) && !(is_comment(tmp->str)))
 			my_error("wronk link format: ", tmp->str);
@@ -515,7 +573,6 @@ void				print_result(t_lemin *ls)
 		(ls->names)[i] = find_room_name_by_number(ls, (ls->final_solv)[i]);
 		i++;
 	}
-	i = 0;
 	st_num = 0;
 	printf("\n");
 	while (st_num <= ls->ant_num + ls->shortest_way)
@@ -538,11 +595,13 @@ void				read_input(t_lemin *ls)
 	size_t	depth;
 
 	depth = 0;
+	// int fd = open("/nfs/2016/m/mpochuka/pool/lem_in/test.txt", O_RDONLY);
 	while(get_next_line(0, &buf) && *buf != '\0')
 		add_data(&RAW_D, buf);
 	if (!(ls->raw) || (ls->raw->str)[0] == '\0')
 		my_error("empty input ", "or file starts with empty line!");
-	// ft_strdel(&buf); //низя стрдел, указатель одинаков с последним стрингом индаты
+	if (*buf == '\0')
+		ft_strdel(&buf); //низя стрдел, указатель одинаков с последним стрингом индаты
 	print_indata(ls);
 	t_indata *process = parse_ant_and_rooms(ls);
 	if (!(ls->start_room_ptr))
@@ -579,5 +638,8 @@ int					main(void)
 
 	ls = ft_memalloc(sizeof(t_lemin));
 	read_input(ls);
+	free_all_data(ls);
+	ls = NULL;
+	// while(1);
 	return (0);
 }
