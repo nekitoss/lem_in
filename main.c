@@ -304,8 +304,8 @@ void				parse_links(t_lemin *ls, t_indata *tmp)
 			n[1] = find_room_number_by_name(ls, arr[1]);
 			if (n[0] != n[1])
 			{
-				ls->dep_matr[n[0]][n[1]] = LINKED;
-				ls->dep_matr[n[1]][n[0]] = LINKED;
+				ls->dep_matr[n[0]][n[1]] = LINK;
+				ls->dep_matr[n[1]][n[0]] = LINK;
 			}
 			ft_arrdel((void ***)&arr);
 		}
@@ -349,7 +349,7 @@ void				find_shortest_way(t_lemin *ls, size_t row, size_t *depth)
 	j = 0;
 	while ((++j - 1) < ls->room_quantity)
 	{
-		if (ls->dep_matr[row][j - 1] == LINKED && !seen_before(ls, depth, j - 1))
+		if (ls->dep_matr[row][j - 1] == LINK && !seen_before(ls, depth, j - 1))
 		{
 			(ls->tmp_slv)[(*depth)] = row;
 			(*depth)++;
@@ -442,7 +442,7 @@ void				parse_data(t_lemin *ls)
 		my_error("no end command found!", "", ls);
 	numerate_rooms(ls, ls->rooms);
 	parse_links(ls, process);
-	if (ls->dep_matr[ls->start_room][ls->end_room] == LINKED)
+	if (ls->dep_matr[ls->start_room][ls->end_room] == LINK)
 		direct_connection(ls);
 	else
 	{

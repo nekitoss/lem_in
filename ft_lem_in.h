@@ -5,7 +5,7 @@
 
 # define RAW_D (ls->raw)
 # define NO_LINK 0
-# define LINKED 1
+# define LINK 1
 # define BLOCKED 3
 # define ARR_T size_t
 
