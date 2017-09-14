@@ -1,42 +1,5 @@
 #include "ft_lem_in.h"
 
-#define RAW_D (ls->raw)
-#define NO_LINK 0
-#define LINKED 1
-#define BLOCKED 3
-
-#define ARRAY_TYPE size_t
-
-typedef struct 		s_indata
-{
-	char			*str;
-	struct s_indata	*next;
-}					t_indata;
-
-typedef struct		s_room
-{
-	char			*name;
-	size_t			num;
-	struct s_room	*next;
-}					t_room;
-
-typedef struct		s_lemin
-{
-	char			**names;
-	t_room			*rooms;
-	t_room			*start_room_ptr;
-	t_room			*end_room_ptr;
-	t_indata		*raw;
-	ARRAY_TYPE		*temp_solv;
-	ARRAY_TYPE		*final_solv;
-	int				**dep_matr;
-	size_t			ant_num;
-	size_t			start_room;
-	size_t			end_room;
-	size_t			room_quantity;
-	size_t			shortest_way;
-}					t_lemin;
-
 void				free_rooms(t_room **fr_r_ptr)
 {
 	if (fr_r_ptr != NULL && *fr_r_ptr != NULL)
@@ -68,8 +31,8 @@ void				free_all_data(t_lemin *ls)
 		ls->start_room_ptr = NULL;
 		ls->end_room_ptr = NULL;
 		free_raw(&(ls->raw));
-		ft_strdel((char **)&(ls->temp_solv));
-		ft_strdel((char **)&(ls->final_solv));
+		ft_strdel((char **)&(ls->tmp_slv));
+		ft_strdel((char **)&(ls->fin_slv));
 		ft_arrdel((void ***)&(ls->dep_matr));
 		ls->ant_num = 0;
 		ls->start_room = 0;
@@ -82,10 +45,10 @@ void				free_all_data(t_lemin *ls)
 
 void				my_error(char *str1, char *str2, t_lemin *ls)
 {
-	printf("%sERROR:%s%s%s\n", "\033[01;31m" ,str1, str2, "\033[0m");
+	printf("%sERROR:%s%s%s\n", "\033[01;31m", str1, str2, "\033[0m");
 	free_all_data(ls);
 	ls = NULL;
-	exit (1);
+	exit(1);
 }
 
 void				add_data(t_indata **head, char *str)
@@ -100,7 +63,7 @@ void				add_data(t_indata **head, char *str)
 	}
 	else
 	{
-		while(tmp->next)
+		while (tmp->next)
 			tmp = tmp->next;
 		tmp->next = (t_indata *)ft_memalloc(sizeof(t_indata));
 		tmp->next->str = (str);
@@ -121,14 +84,14 @@ t_room				*add_room(t_room **head, char *str, t_lemin *ls)
 	}
 	else
 	{
-		while(tmp->next)
+		while (tmp->next)
 		{
 			if (ft_strequ(tmp_name, tmp->name))
 				my_error("room already exist: ", str, ls);
 			tmp = tmp->next;
 		}
 		if (ft_strequ(tmp_name, tmp->name))
-				my_error("room already exist: ", str, ls);
+			my_error("room already exist: ", str, ls);
 		tmp->next = (t_room *)ft_memalloc(sizeof(t_room));
 		tmp = tmp->next;
 	}
@@ -173,10 +136,11 @@ int					is_room(char *str, t_lemin *ls)
 		if (ft_cntchr(str, ' ') == 2)
 		{
 			tmp = ft_strsplit(str, ' ');
-			if (!(ft_is_number(tmp[1], 0, -1)) || !(ft_is_number(tmp[2], 0, -1)))
+			if (!(ft_is_number(tmp[1], 0, -1))
+				|| !(ft_is_number(tmp[2], 0, -1)))
 			{
-				my_error("room coordinate is not a number: ", (!(ft_is_number(tmp[1], 0, -1)) ? tmp[1] : tmp[2]), ls);
-				return (0);
+				my_error("room coordinate is not a number: ",
+					(!(ft_is_number(tmp[1], 0, -1)) ? tmp[1] : tmp[2]), ls);
 			}
 			ft_arrdel((void ***)&tmp);
 		}
@@ -198,7 +162,8 @@ t_indata			*find_ant_num(t_indata *tmp, t_lemin *ls)
 
 	while (tmp)
 	{
-		if ((is_command(tmp->str) && ((ft_strcmp(tmp->str, "##start") && ft_strcmp(tmp->str, "##end")))) || (is_comment(tmp->str)))
+		if ((is_command(tmp->str) && ((ft_strcmp(tmp->str, "##start")
+			&& ft_strcmp(tmp->str, "##end")))) || (is_comment(tmp->str)))
 		{
 			tmp = tmp->next;
 			continue ;
@@ -224,7 +189,7 @@ void				read_end_start_room(t_lemin *ls, t_indata **tmp, int start)
 		if (is_room((*tmp)->str, ls))
 		{
 			if (start)
-			{	
+			{
 				if (ls->start_room_ptr)
 					my_error("start command repeats", "", ls);
 				ls->start_room_ptr = add_room(&(ls->rooms), (*tmp)->str, ls);
@@ -239,9 +204,9 @@ void				read_end_start_room(t_lemin *ls, t_indata **tmp, int start)
 		}
 	}
 	if (start)
-		my_error("no correct room after start command, instead got: ", (*tmp)->str, ls);
+		my_error("incorrect room after start, instead got: ", (*tmp)->str, ls);
 	else
-		my_error("no correct room after end command, instead got: ", (*tmp)->str, ls);
+		my_error("incorrect room after end, instead got: ", (*tmp)->str, ls);
 }
 
 void				numerate_rooms(t_lemin *ls, t_room *rm)
@@ -280,17 +245,14 @@ t_indata			*parse_ant_and_rooms(t_lemin *ls)
 				else if ((is_link(tmp->str)))
 					return (tmp);
 				else
-					my_error("Wrong link, or no links found after room: ", tmp->str, ls);
+					my_error("Wrong link, or no links found: ", tmp->str, ls);
 			}
-			else
+			else if (tmp->next != NULL)
 			{
-				if (tmp->next != NULL)
-				{
-					if (ft_strcmp(tmp->str, "##start") == 0)
-						read_end_start_room(ls, &tmp, 1);
-					else if (ft_strcmp(tmp->str, "##end") == 0)
-						read_end_start_room(ls, &tmp, 0);
-				}
+				if (ft_strcmp(tmp->str, "##start") == 0)
+					read_end_start_room(ls, &tmp, 1);
+				else if (ft_strcmp(tmp->str, "##end") == 0)
+					read_end_start_room(ls, &tmp, 0);
 			}
 		}
 		tmp = tmp->next;
@@ -313,7 +275,7 @@ void				print_indata(t_lemin *ls)
 size_t				find_room_number_by_name(t_lemin *ls, char *str)
 {
 	t_room	*tmp;
-	
+
 	tmp = ls->rooms;
 	while (tmp)
 	{
@@ -328,8 +290,7 @@ size_t				find_room_number_by_name(t_lemin *ls, char *str)
 void				parse_links(t_lemin *ls, t_indata *tmp)
 {
 	char	**arr;
-	size_t	n1;
-	size_t	n2;
+	size_t	n[2];
 
 	if (tmp == NULL)
 		my_error("no links found!", "", ls);
@@ -339,16 +300,17 @@ void				parse_links(t_lemin *ls, t_indata *tmp)
 		if (*(tmp->str) != '#' && is_link(tmp->str))
 		{
 			arr = ft_strsplit(tmp->str, '-');
-			n1 = find_room_number_by_name(ls, arr[0]);
-			n2 = find_room_number_by_name(ls, arr[1]);
-			if (n1 != n2)
+			n[0] = find_room_number_by_name(ls, arr[0]);
+			n[1] = find_room_number_by_name(ls, arr[1]);
+			if (n[0] != n[1])
 			{
-				ls->dep_matr[n1][n2] = LINKED;
-				ls->dep_matr[n2][n1] = LINKED;
+				ls->dep_matr[n[0]][n[1]] = LINKED;
+				ls->dep_matr[n[1]][n[0]] = LINKED;
 			}
 			ft_arrdel((void ***)&arr);
 		}
-		else if (!(is_command(tmp->str) && (ft_strcmp(tmp->str, "##start") && ft_strcmp(tmp->str, "##end"))) && !(is_comment(tmp->str)))
+		else if (!(is_command(tmp->str) && (ft_strcmp(tmp->str, "##start")
+			&& ft_strcmp(tmp->str, "##end"))) && !(is_comment(tmp->str)))
 			my_error("wronk link format: ", tmp->str, ls);
 		tmp = tmp->next;
 	}
@@ -361,40 +323,39 @@ int					seen_before(t_lemin *ls, size_t *depth, size_t row_to_check)
 	i = 0;
 	while (i < (*depth))
 	{
-		if  ((ls->temp_solv)[i] == row_to_check)
+		if ((ls->tmp_slv)[i] == row_to_check)
 			return (1);
 		i++;
 	}
 	return (0);
 }
 
-void					find_shortest_way(t_lemin *ls, size_t row, size_t *depth)
+void				find_shortest_way(t_lemin *ls, size_t row, size_t *depth)
 {
 	size_t	j;
-	
+
 	if ((*depth) > ls->shortest_way)
 		return ;
 	if (row == ls->end_room)
 	{
 		if ((*depth) < ls->shortest_way)
 		{
-			(ls->temp_solv)[(*depth)] = row;
+			(ls->tmp_slv)[(*depth)] = row;
 			ls->shortest_way = *depth;
-			ft_memcpy(ls->final_solv, ls->temp_solv, sizeof(ARRAY_TYPE) * (*depth + 1));
+			ft_memcpy(ls->fin_slv, ls->tmp_slv, sizeof(ARR_T) * (*depth + 1));
 		}
 		return ;
 	}
 	j = 0;
-	while (j < ls->room_quantity)
+	while ((++j - 1) < ls->room_quantity)
 	{
-		if (ls->dep_matr[row][j] == LINKED && !seen_before(ls, depth, j))
+		if (ls->dep_matr[row][j - 1] == LINKED && !seen_before(ls, depth, j - 1))
 		{
-			(ls->temp_solv)[(*depth)] = row;
+			(ls->tmp_slv)[(*depth)] = row;
 			(*depth)++;
-			find_shortest_way(ls, j, depth);
+			find_shortest_way(ls, j - 1, depth);
 			(*depth)--;
 		}
-		j++;
 	}
 }
 
@@ -415,7 +376,7 @@ void				direct_connection(t_lemin *ls)
 char				*find_room_name_by_number(t_lemin *ls, size_t num)
 {
 	t_room	*tmp;
-	
+
 	tmp = ls->rooms;
 	while (tmp)
 	{
@@ -436,7 +397,7 @@ void				print_result(t_lemin *ls)
 	i = 0;
 	while (i < ls->shortest_way + 1)
 	{
-		(ls->names)[i] = find_room_name_by_number(ls, (ls->final_solv)[i]);
+		(ls->names)[i] = find_room_name_by_number(ls, (ls->fin_slv)[i]);
 		i++;
 	}
 	st_num = 0;
@@ -457,18 +418,24 @@ void				print_result(t_lemin *ls)
 
 void				read_input(t_lemin *ls)
 {
-	char	*buf;
-	size_t	depth;
+	char		*buf;
 
-	depth = 0;
-	while(get_next_line(0, &buf) && *buf != '\0')
+	while (get_next_line(0, &buf) && *buf != '\0')
 		add_data(&RAW_D, buf);
 	if (!(ls->raw) || (ls->raw->str)[0] == '\0')
 		my_error("empty input ", "or file starts with empty line!", ls);
 	if (*buf == '\0')
 		ft_strdel(&buf);
 	print_indata(ls);
-	t_indata *process = parse_ant_and_rooms(ls);
+}
+
+void				parse_data(t_lemin *ls)
+{
+	t_indata	*process;
+	size_t		depth;
+
+	depth = 0;
+	process = parse_ant_and_rooms(ls);
 	if (!(ls->start_room_ptr))
 		my_error("no start command found!", "", ls);
 	if (!(ls->end_room_ptr))
@@ -479,8 +446,8 @@ void				read_input(t_lemin *ls)
 		direct_connection(ls);
 	else
 	{
-		ls->temp_solv = (ARRAY_TYPE *)ft_memalloc(sizeof(ARRAY_TYPE) * ls->room_quantity + 1);
-		ls->final_solv = (ARRAY_TYPE *)ft_memalloc(sizeof(ARRAY_TYPE) * ls->room_quantity + 1);
+		ls->tmp_slv = ft_memalloc(sizeof(ARR_T) * ls->room_quantity + 1);
+		ls->fin_slv = ft_memalloc(sizeof(ARR_T) * ls->room_quantity + 1);
 		ls->shortest_way = ULONG_MAX;
 		find_shortest_way(ls, ls->start_room, &depth);
 		if (ls->shortest_way == ULONG_MAX)
@@ -495,6 +462,7 @@ int					main(void)
 
 	ls = ft_memalloc(sizeof(t_lemin));
 	read_input(ls);
+	parse_data(ls);
 	free_all_data(ls);
 	ls = NULL;
 	return (0);
