@@ -296,7 +296,7 @@ void				read_end_start_room(t_lemin *ls, t_indata **tmp, int start)
 		my_error("no correct room after end command, instead got: ", (*tmp)->str);
 }
 
-void				print_rooms(t_lemin *ls)
+/*void				print_rooms(t_lemin *ls)
 {
 	t_room *tmp;
 
@@ -329,7 +329,7 @@ void				print_dep_matrix(t_lemin *ls)
 		i++;
 	}
 	printf("END_DEPENDANCE_MATRIX;\n");
-}
+}*/
 
 void				numerate_rooms(t_lemin *ls, t_room *rm)
 {
@@ -479,7 +479,6 @@ int					seen_before(t_lemin *ls, size_t *depth, size_t row_to_check)
 	}
 	return (0);
 }
-// size_t cnt = 0;
 
 void					find_shortest_way(t_lemin *ls, size_t row, size_t *depth)
 {
@@ -488,39 +487,19 @@ void					find_shortest_way(t_lemin *ls, size_t row, size_t *depth)
 // print_dep_matrix(ls);
 	if ((*depth) > ls->shortest_way)
 		return ;
-	if (row == ls->end_room && (*depth) < ls->shortest_way)
+	if (row == ls->end_room)
 	{
-		// cnt++;
-		(ls->temp_solv)[(*depth)] = row;
-		ls->shortest_way = *depth;
-		// printf("\n%zu\n", *depth);
-		// zz = 0;
-
-		// while (zz < *depth)
-		// {
-		// 	ls->final_solv[zz] = ls->temp_solv[zz];
-		// 	zz++;
-		// }
-		// printf("\ndepth=%zu\n", *depth);
-		// for (unsigned int z = 0; z <= (*depth); z++)
-		// {
-		// 	ls->final_solv[z] = ls->temp_solv[z];
-		// 	// printf(" %2zu", (ls->temp_solv)[z]);
-		// }
-		// printf("\n");
-		//memcpy(&(ls->shortest_way), depth, sizeof(ARRAY_TYPE));
-		//printf("shortest = %zu\n", ls->shortest_way);
-		ft_memcpy(ls->final_solv, ls->temp_solv, sizeof(ARRAY_TYPE) * (*depth + 1));
-		// ls->shortest_way = (*depth);
+		if ((*depth) < ls->shortest_way)
+		{
+			(ls->temp_solv)[(*depth)] = row;
+			ls->shortest_way = *depth;
+			ft_memcpy(ls->final_solv, ls->temp_solv, sizeof(ARRAY_TYPE) * (*depth + 1));
+		}
 		return ;
 	}
-	// cnt++;
-	// if ((*depth) > ls->room_quantity + 1)
-	// 	my_error("recursion gone to deep in you", "");
 	j = 0;
 	while (j < ls->room_quantity)
 	{
-		// if (row != j && ls->dep_matr[row][j] == LINKED && !seen_before(ls, depth, j))
 		if (ls->dep_matr[row][j] == LINKED && !seen_before(ls, depth, j))
 		{
 			(ls->temp_solv)[(*depth)] = row;
