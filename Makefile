@@ -13,7 +13,15 @@ FLAGS = -Wall -Wextra -Werror
 
 NAME = lem-in
 
-SRC = main.c
+SRC = main.c\
+		free_and_error.c\
+		check_functions.c\
+		parse_1.c\
+		parse_2.c\
+		find_way.c\
+		output.c\
+		input.c\
+		finders.c
 
 OBJ = $(SRC:.c=.o)
 
