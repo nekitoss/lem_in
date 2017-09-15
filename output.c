@@ -37,6 +37,7 @@ void				direct_connection(t_lemin *ls)
 	}
 	printf("\n");
 }
+
 void				print_result(t_lemin *ls)
 {
 	size_t	i;

@@ -52,7 +52,6 @@ size_t				find_room_number_by_name(t_lemin *ls, char *str)
 	return (0);
 }
 
-
 char				*find_room_name_by_number(t_lemin *ls, size_t num)
 {
 	t_room	*tmp;

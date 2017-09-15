@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_lem_in.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nekitoss <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/09/15 16:46:40 by nekitoss          #+#    #+#             */
+/*   Updated: 2017/09/15 16:46:42 by nekitoss         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef FT_LEM_IN_H
 # define FT_LEM_IN_H
 
@@ -69,7 +81,6 @@ void				print_result(t_lemin *ls);
 
 void				read_input(t_lemin *ls);
 void				add_data(t_indata **head, char *str);
-
 
 t_indata			*find_ant_num(t_indata *tmp, t_lemin *ls);
 size_t				find_room_number_by_name(t_lemin *ls, char *str);
