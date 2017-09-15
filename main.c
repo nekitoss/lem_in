@@ -227,6 +227,14 @@ void				numerate_rooms(t_lemin *ls, t_room *rm)
 	ls->room_quantity = i;
 }
 
+void				check_command(t_lemin *ls, t_indata **tmp)
+{
+	if (ft_strcmp((*tmp)->str, "##start") == 0)
+		read_end_start_room(ls, tmp, 1);
+	else if (ft_strcmp((*tmp)->str, "##end") == 0)
+		read_end_start_room(ls, tmp, 0);
+}
+
 t_indata			*parse_ant_and_rooms(t_lemin *ls)
 {
 	t_indata *tmp;
@@ -248,12 +256,7 @@ t_indata			*parse_ant_and_rooms(t_lemin *ls)
 					my_error("Wrong link, or no links found: ", tmp->str, ls);
 			}
 			else if (tmp->next != NULL)
-			{
-				if (ft_strcmp(tmp->str, "##start") == 0)
-					read_end_start_room(ls, &tmp, 1);
-				else if (ft_strcmp(tmp->str, "##end") == 0)
-					read_end_start_room(ls, &tmp, 0);
-			}
+				check_command(ls, &tmp);
 		}
 		tmp = tmp->next;
 	}
