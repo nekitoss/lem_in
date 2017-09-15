@@ -19,7 +19,6 @@ void				print_indata(t_lemin *ls)
 	tmp = RAW_D;
 	while (tmp)
 	{
-		// printf("%s\n", tmp->str);
 		ft_putendl(tmp->str);
 		tmp = tmp->next;
 	}
@@ -42,12 +41,10 @@ void				direct_connection(t_lemin *ls)
 	printf("\n");
 	while (i < ls->ant_num + 1)
 	{
-		// printf("L%zu-%s ", i, ls->end_room_ptr->name);
 		print_one_ant(i, ls->end_room_ptr->name);
 		i++;
 	}
 	ft_putchar('\n');
-	// printf("\n");
 }
 
 void				print_result(t_lemin *ls)
@@ -71,11 +68,9 @@ void				print_result(t_lemin *ls)
 		{
 			if (st_num - i < ls->ant_num)
 				print_one_ant(st_num - i + 1, (ls->names)[i]);
-				//printf("L%zu-%s ", st_num - i + 1, (ls->names)[i]);
 			i++;
 		}
 		ft_putchar('\n');
-		// printf("\n");
 		st_num++;
 	}
 }
