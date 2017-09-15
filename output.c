@@ -19,9 +19,19 @@ void				print_indata(t_lemin *ls)
 	tmp = RAW_D;
 	while (tmp)
 	{
-		printf("%s\n", tmp->str);
+		// printf("%s\n", tmp->str);
+		ft_putendl(tmp->str);
 		tmp = tmp->next;
 	}
+}
+
+void				print_one_ant(size_t num, char *to_room)
+{
+	ft_putchar('L');
+	ft_putnbr_u(num);
+	ft_putchar('-');
+	ft_putstr(to_room);
+	ft_putchar(' ');
 }
 
 void				direct_connection(t_lemin *ls)
@@ -32,10 +42,12 @@ void				direct_connection(t_lemin *ls)
 	printf("\n");
 	while (i < ls->ant_num + 1)
 	{
-		printf("L%zu-%s ", i, ls->end_room_ptr->name);
+		// printf("L%zu-%s ", i, ls->end_room_ptr->name);
+		print_one_ant(i, ls->end_room_ptr->name);
 		i++;
 	}
-	printf("\n");
+	ft_putchar('\n');
+	// printf("\n");
 }
 
 void				print_result(t_lemin *ls)
@@ -58,10 +70,12 @@ void				print_result(t_lemin *ls)
 		while (i <= ls->shortest_way && i <= st_num)
 		{
 			if (st_num - i < ls->ant_num)
-				printf("L%zu-%s ", st_num - i + 1, (ls->names)[i]);
+				print_one_ant(st_num - i + 1, (ls->names)[i]);
+				//printf("L%zu-%s ", st_num - i + 1, (ls->names)[i]);
 			i++;
 		}
-		printf("\n");
+		ft_putchar('\n');
+		// printf("\n");
 		st_num++;
 	}
 }

@@ -57,7 +57,12 @@ void				free_all_data(t_lemin *ls)
 
 void				my_error(char *str1, char *str2, t_lemin *ls)
 {
-	printf("%sERROR:%s%s%s\n", "\033[01;31m", str1, str2, "\033[0m");
+	// printf("%sERROR:%s%s%s\n", "\033[01;31m", str1, str2, "\033[0m");
+	ft_putstr("\033[01;31m");
+	ft_putstr("ERROR: ");
+	ft_putstr(str1);
+	ft_putstr(str2);
+	ft_putendl("\033[0m");
 	free_all_data(ls);
 	ls = NULL;
 	exit(1);

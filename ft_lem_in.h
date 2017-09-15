@@ -76,6 +76,7 @@ int					seen_before(t_lemin *ls, size_t *depth,
 								size_t row_to_check);
 
 void				print_indata(t_lemin *ls);
+void				print_one_ant(size_t num, char *to_room);
 void				direct_connection(t_lemin *ls);
 void				print_result(t_lemin *ls);
 

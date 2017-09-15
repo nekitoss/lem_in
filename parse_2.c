@@ -83,7 +83,7 @@ void				parse_links(t_lemin *ls, t_indata *tmp)
 		}
 		else if (!(is_command(tmp->str) && (ft_strcmp(tmp->str, "##start")
 			&& ft_strcmp(tmp->str, "##end"))) && !(is_comment(tmp->str)))
-			my_error("wronk link format: ", tmp->str, ls);
+			my_error("wrong link format: ", tmp->str, ls);
 		tmp = tmp->next;
 	}
 }

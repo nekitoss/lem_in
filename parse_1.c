@@ -93,7 +93,7 @@ t_indata			*parse_ant_and_rooms(t_lemin *ls)
 				else if ((is_link(tmp->str)))
 					return (tmp);
 				else
-					my_error("Wrong link, or no links found: ", tmp->str, ls);
+					my_error("wrong link, or no links found: ", tmp->str, ls);
 			}
 			else if (tmp->next != NULL)
 				check_command(ls, &tmp);
